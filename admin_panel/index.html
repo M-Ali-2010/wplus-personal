@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>W+ Admin Panel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050510;
+      --surface: #0f0f1a;
+      --card: #12121f;
+      --border: #1a1a2e;
+      --primary: #ff00ff;
+      --secondary: #8a2be2;
+      --success: #00e676;
+      --warning: #ffb300;
+      --error: #ff5252;
+      --text: #ffffff;
+      --muted: #6b6b80;
+      --text2: #b0b0c0;
+      --grad: linear-gradient(135deg, #ff00ff, #8a2be2);
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* AUTH */
+    #auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .auth-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px; width: 360px; text-align: center; }
+    .auth-logo { font-size: 48px; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .auth-sub { color: var(--muted); margin-bottom: 28px; font-size: 14px; }
+    .auth-box input { width: 100%; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; margin-bottom: 12px; }
+    .auth-box input:focus { outline: none; border-color: var(--primary); }
+    .btn-primary { width: 100%; padding: 12px; background: var(--grad); border: none; border-radius: 10px; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; transition: opacity .2s; }
+    .btn-primary:hover { opacity: .85; }
+    .auth-error { color: var(--error); font-size: 13px; margin-top: 8px; }
+
+    /* LAYOUT */
+    #app { display: none; }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 10; }
+    .sidebar-logo { padding: 20px; font-size: 22px; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: 1px solid var(--border); }
+    .sidebar-logo span { color: var(--muted); font-size: 11px; display: block; font-weight: 400; -webkit-text-fill-color: var(--muted); }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; cursor: pointer; color: var(--text2); font-size: 14px; font-weight: 500; transition: all .15s; border: none; background: none; width: 100%; text-align: left; }
+    .nav-item:hover { background: var(--border); color: var(--text); }
+    .nav-item.active { background: rgba(255,0,255,.1); color: var(--primary); border-right: 2px solid var(--primary); }
+    .nav-icon { font-size: 18px; width: 20px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); }
+    .sidebar-user { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .btn-logout { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; width: 100%; }
+    .btn-logout:hover { border-color: var(--error); color: var(--error); }
+
+    /* MAIN */
+    .main { margin-left: 220px; padding: 28px; flex: 1; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--grad); }
+    .stat-value { font-size: 26px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .stat-icon { font-size: 26px; position: absolute; right: 14px; top: 14px; opacity: .12; }
+
+    /* TABLE */
+    .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+    .table-title { font-weight: 700; font-size: 15px; }
+    .table-count { font-size: 12px; color: var(--muted); margin-left: 6px; }
+    .search-input { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 13px; width: 220px; }
+    .search-input:focus { outline: none; border-color: var(--primary); }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 12px 16px; font-size: 11px; font-weight: 600; color: var(--muted); text-align: left; text-transform: uppercase; letter-spacing: .5px; background: var(--surface); }
+    td { padding: 12px 16px; font-size: 13px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    /* ELEMENTS */
+    .avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; background: rgba(255,0,255,.2); color: var(--primary); margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .badge-live { background: rgba(255,23,68,.2); color: #ff5252; }
+    .badge-ended { background: rgba(107,107,128,.15); color: var(--muted); }
+    .badge-scheduled { background: rgba(255,179,0,.15); color: var(--warning); }
+    .badge-creator { background: rgba(138,43,226,.2); color: var(--secondary); }
+    .badge-admin { background: rgba(255,0,255,.2); color: var(--primary); }
+    .badge-user { background: rgba(107,107,128,.15); color: var(--muted); }
+    .badge-ok { background: rgba(0,230,118,.15); color: var(--success); }
+    .badge-banned { background: rgba(255,82,82,.2); color: var(--error); }
+    .badge-open { background: rgba(0,230,118,.15); color: var(--success); }
+
+    .action-btn { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; transition: opacity .2s; margin-right: 4px; }
+    .action-btn:hover { opacity: .8; }
+    .btn-verify { background: rgba(0,230,118,.15); color: var(--success); }
+    .btn-ban { background: rgba(255,82,82,.15); color: var(--error); }
+    .btn-end { background: rgba(255,82,82,.15); color: var(--error); }
+    .btn-refresh { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+    .btn-refresh:hover { border-color: var(--primary); color: var(--primary); }
+
+    .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-row td { text-align: center; padding: 32px; }
+
+    #toast { position: fixed; bottom: 24px; right: 24px; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; }
+    #toast.show { opacity: 1; }
+    #toast.success { border-color: var(--success); }
+    #toast.error { border-color: var(--error); }
+  </style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-page">
+  <div class="auth-box">
+    <div class="auth-logo">W+</div>
+    <div class="auth-sub">Admin Panel</div>
+    <input type="email" id="email" placeholder="Email" value="admin@wplus.dev" />
+    <input type="password" id="password" placeholder="Password" value="admin123" onkeydown="if(event.key==='Enter')login()" />
+    <button class="btn-primary" onclick="login()">Sign In</button>
+    <div class="auth-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">W+ <span>Admin Panel</span></div>
+      <nav style="padding-top:8px">
+        <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</button>
+        <button class="nav-item" onclick="showPage('users',this)"><span class="nav-icon">👥</span> Users</button>
+        <button class="nav-item" onclick="showPage('streams',this)"><span class="nav-icon">📡</span> Streams</button>
+        <button class="nav-item" onclick="showPage('transactions',this)"><span class="nav-icon">💳</span> Transactions</button>
+        <button class="nav-item" onclick="showPage('donations',this)"><span class="nav-icon">💜</span> Donations</button>
+        <button class="nav-item" onclick="showPage('gifts',this)"><span class="nav-icon">🎁</span> Gifts</button>
+        <button class="nav-item" onclick="showPage('paid-messages',this)"><span class="nav-icon">💎</span> Paid Messages</button>
+        <button class="nav-item" onclick="showPage('marketplace',this)"><span class="nav-icon">💼</span> Marketplace</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user" id="admin-email">—</div>
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-title">Dashboard</div>
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-value">…</div><div class="stat-label">Loading</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="table-wrap">
+            <div class="table-header"><span class="table-title">Recent Users</span></div>
+            <table><thead><tr><th>User</th><th>Role</th></tr></thead><tbody id="recent-users"><tr class="loading-row"><td colspan="2"><span class="spinner"></span></td></tr></tbody></table>
+          </div>
+          <div class="table-wrap">
+            <div class="table-header"><span class="table-title">Live Streams</span></div>
+            <table><thead><tr><th>Title</th><th>Viewers</th></tr></thead><tbody id="recent-streams"><tr class="loading-row"><td colspan="2"><span class="spinner"></span></td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="page-users" class="page">
+        <div class="page-title">Users</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span><span class="table-title">All Users</span><span class="table-count" id="users-count"></span></span>
+            <input class="search-input" id="users-search" placeholder="Search name / email…" oninput="filterUsers()" />
+          </div>
+          <table><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="users-body"><tr class="loading-row"><td colspan="6"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- STREAMS -->
+      <div id="page-streams" class="page">
+        <div class="page-title">Streams</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span><span class="table-title">All Streams</span><span class="table-count" id="streams-count"></span></span>
+            <button class="btn-refresh" onclick="loadStreams()">↻ Refresh</button>
+          </div>
+          <table><thead><tr><th>Title</th><th>Creator</th><th>Status</th><th>Viewers</th><th>Gifts</th><th>Donations</th><th>Actions</th></tr></thead><tbody id="streams-body"><tr class="loading-row"><td colspan="7"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div id="page-transactions" class="page">
+        <div class="page-title">Transactions</div>
+        <div class="table-wrap">
+          <div class="table-header"><span><span class="table-title">All Transactions</span><span class="table-count" id="tx-count"></span></span></div>
+          <table><thead><tr><th>ID</th><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="tx-body"><tr class="loading-row"><td colspan="5"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- DONATIONS -->
+      <div id="page-donations" class="page">
+        <div class="page-title">Donations</div>
+        <div class="table-wrap">
+          <div class="table-header"><span><span class="table-title">All Donations</span><span class="table-count" id="donations-count"></span></span></div>
+          <table><thead><tr><th>From</th><th>To</th><th>Amount</th><th>Message</th><th>Date</th></tr></thead><tbody id="donations-body"><tr class="loading-row"><td colspan="5"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- GIFTS -->
+      <div id="page-gifts" class="page">
+        <div class="page-title">Gifts Catalog</div>
+        <div class="table-wrap">
+          <div class="table-header"><span><span class="table-title">All Gifts</span><span class="table-count" id="gifts-count"></span></span></div>
+          <table><thead><tr><th>Gift</th><th>Category</th><th>Price</th><th>Type</th></tr></thead><tbody id="gifts-body"><tr class="loading-row"><td colspan="4"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- PAID MESSAGES -->
+      <div id="page-paid-messages" class="page">
+        <div class="page-title">Paid Messages</div>
+        <div class="table-wrap">
+          <div class="table-header"><span><span class="table-title">All Paid Messages</span><span class="table-count" id="pm-count"></span></span></div>
+          <table><thead><tr><th>From</th><th>To</th><th>Message</th><th>Amount</th><th>Date</th></tr></thead><tbody id="pm-body"><tr class="loading-row"><td colspan="5"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- MARKETPLACE -->
+      <div id="page-marketplace" class="page">
+        <div class="page-title">Marketplace Jobs</div>
+        <div class="table-wrap">
+          <div class="table-header"><span><span class="table-title">All Jobs</span><span class="table-count" id="jobs-count"></span></span></div>
+          <table><thead><tr><th>Title</th><th>Category</th><th>Budget</th><th>Applicants</th><th>Status</th><th>Date</th></tr></thead><tbody id="jobs-body"><tr class="loading-row"><td colspan="6"><span class="spinner"></span></td></tr></tbody></table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:3000';
+let token = localStorage.getItem('wplus_admin_token');
+let allUsers = [];
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+
+async function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  document.getElementById('login-error').textContent = '';
+  try {
+    const res = await fetch(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) throw new Error('Invalid credentials');
+    const data = await res.json();
+    token = data.accessToken;
+    localStorage.setItem('wplus_admin_token', token);
+    try { document.getElementById('admin-email').textContent = email; } catch(_) {}
+    showApp();
+  } catch (e) {
+    document.getElementById('login-error').textContent = e.message;
+  }
+}
+
+function logout() {
+  token = null;
+  localStorage.removeItem('wplus_admin_token');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-page').style.display = 'flex';
+}
+
+// ── API ───────────────────────────────────────────────────────────────────
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(`${API}${path}`, {
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) },
+    ...opts,
+  });
+  if (res.status === 401) { logout(); return null; }
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+
+function showApp() {
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadDashboard();
+}
+
+if (token) {
+  try { document.getElementById('admin-email').textContent = JSON.parse(atob(token.split('.')[1])).email || ''; } catch(_) {}
+  showApp();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  const loaders = { users: loadUsers, streams: loadStreams, transactions: loadTransactions, donations: loadDonations, gifts: loadGifts, 'paid-messages': loadPaidMessages, marketplace: loadMarketplace };
+  if (loaders[name]) loaders[name]();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+
+function fmt(date) {
+  if (!date) return '—';
+  return new Date(date).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + (type || 'success');
+  setTimeout(() => { el.className = ''; }, 3000);
+}
+
+function loadingRow(cols) {
+  return '<tr class="loading-row"><td colspan="' + cols + '"><span class="spinner"></span></td></tr>';
+}
+
+function roleBadge(role) {
+  const cls = { creator: 'badge-creator', admin: 'badge-admin', super_admin: 'badge-admin', user: 'badge-user' };
+  return '<span class="badge ' + (cls[role] || 'badge-user') + '">' + role + '</span>';
+}
+
+function statusBadge(status) {
+  const cls = { live: 'badge-live', ended: 'badge-ended', scheduled: 'badge-scheduled', open: 'badge-open' };
+  return '<span class="badge ' + (cls[status] || 'badge-user') + '">' + status + '</span>';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+
+async function loadDashboard() {
+  try {
+    const [stats, users, streams] = await Promise.all([
+      apiFetch('/api/admin/stats'),
+      apiFetch('/api/admin/users'),
+      apiFetch('/api/admin/streams'),
+    ]);
+
+    if (stats) {
+      const items = [
+        ['👥', stats.users || 0, 'Total Users'],
+        ['🎨', stats.creators || 0, 'Creators'],
+        ['📡', stats.streams || 0, 'All Streams'],
+        ['🔴', stats.liveStreams || 0, 'Live Now'],
+        ['💳', stats.transactions || 0, 'Transactions'],
+        ['🎁', stats.gifts || 0, 'Gift Sends'],
+        ['💜', stats.donations || 0, 'Donations'],
+        ['💎', stats.paidMessages || 0, 'Paid Messages'],
+        ['💰', (stats.totalRevenue || 0).toLocaleString() + ' W', 'Total Revenue'],
+      ];
+      document.getElementById('stats-grid').innerHTML = items.map(function(i) {
+        return '<div class="stat-card"><div class="stat-icon">' + i[0] + '</div><div class="stat-value">' + i[1] + '</div><div class="stat-label">' + i[2] + '</div></div>';
+      }).join('');
+    }
+
+    if (users) {
+      allUsers = users;
+      document.getElementById('recent-users').innerHTML = users.slice(0, 8).map(function(u) {
+        return '<tr><td><span class="avatar">' + (u.displayName || '?')[0].toUpperCase() + '</span>' + u.displayName + '</td><td>' + roleBadge(u.role) + '</td></tr>';
+      }).join('') || '<tr><td colspan="2" class="empty">No users</td></tr>';
+    }
+
+    if (streams) {
+      var live = streams.filter(function(s) { return s.status === 'live'; });
+      document.getElementById('recent-streams').innerHTML = live.length
+        ? live.map(function(s) { return '<tr><td>' + s.title + '</td><td>' + s.viewerCount + '</td></tr>'; }).join('')
+        : '<tr><td colspan="2" class="empty">No live streams</td></tr>';
+    }
+  } catch(e) { showToast('Dashboard error: ' + e.message, 'error'); }
+}
+
+// ── USERS ─────────────────────────────────────────────────────────────────
+
+async function loadUsers() {
+  document.getElementById('users-body').innerHTML = loadingRow(6);
+  try {
+    allUsers = await apiFetch('/api/admin/users');
+    document.getElementById('users-count').textContent = '(' + allUsers.length + ')';
+    renderUsers(allUsers);
+  } catch(e) { document.getElementById('users-body').innerHTML = '<tr><td colspan="6" class="empty">' + e.message + '</td></tr>'; }
+}
+
+function renderUsers(users) {
+  document.getElementById('users-body').innerHTML = users.map(function(u) {
+    return '<tr>' +
+      '<td><span class="avatar">' + (u.displayName || '?')[0].toUpperCase() + '</span><strong>' + u.displayName + '</strong> <span style="color:var(--muted);font-size:12px">@' + u.username + '</span>' + (u.isVerified ? ' <span class="badge badge-ok">✓ verified</span>' : '') + '</td>' +
+      '<td style="color:var(--muted);font-size:12px">' + (u.email || '—') + '</td>' +
+      '<td>' + roleBadge(u.role) + '</td>' +
+      '<td>' + (u.isBanned ? '<span class="badge badge-banned">banned</span>' : '<span style="color:var(--success);font-size:12px">active</span>') + '</td>' +
+      '<td style="color:var(--muted);font-size:12px">' + fmt(u.createdAt) + '</td>' +
+      '<td><button class="action-btn btn-verify" onclick="toggleVerify(\'' + u.id + '\', this)">' + (u.isVerified ? 'Unverify' : 'Verify') + '</button>' +
+      '<button class="action-btn btn-ban" onclick="toggleBan(\'' + u.id + '\',' + (u.isBanned ? 'true' : 'false') + ', this)">' + (u.isBanned ? 'Unban' : 'Ban') + '</button></td>' +
+      '</tr>';
+  }).join('') || '<tr><td colspan="6" class="empty">No users</td></tr>';
+}
+
+function filterUsers() {
+  var q = document.getElementById('users-search').value.toLowerCase();
+  renderUsers(allUsers.filter(function(u) {
+    return (u.displayName || '').toLowerCase().includes(q) || (u.username || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q);
+  }));
+}
+
+async function toggleVerify(id, btn) {
+  try {
+    var res = await apiFetch('/api/admin/users/' + id + '/verify', { method: 'PATCH' });
+    showToast(res.isVerified ? 'User verified ✓' : 'Verification removed');
+    loadUsers();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function toggleBan(id, isBanned, btn) {
+  if (!isBanned && !confirm('Ban this user?')) return;
+  var path = isBanned ? '/api/admin/users/' + id + '/unban' : '/api/admin/users/' + id + '/ban';
+  try {
+    await apiFetch(path, { method: 'POST', body: '{}' });
+    showToast(isBanned ? 'User unbanned' : 'User banned');
+    loadUsers();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── STREAMS ───────────────────────────────────────────────────────────────
+
+async function loadStreams() {
+  document.getElementById('streams-body').innerHTML = loadingRow(7);
+  try {
+    var streams = await apiFetch('/api/admin/streams');
+    document.getElementById('streams-count').textContent = '(' + streams.length + ')';
+    document.getElementById('streams-body').innerHTML = streams.map(function(s) {
+      return '<tr>' +
+        '<td><strong>' + s.title + '</strong></td>' +
+        '<td><span class="avatar">' + ((s.creator && s.creator.displayName) ? s.creator.displayName[0].toUpperCase() : '?') + '</span>' + (s.creator ? s.creator.displayName : '—') + '</td>' +
+        '<td>' + statusBadge(s.status) + '</td>' +
+        '<td>' + s.viewerCount + '</td>' +
+        '<td>' + Math.round(Number(s.giftsTotal) || 0) + ' W</td>' +
+        '<td>' + Math.round(Number(s.donationsTotal) || 0) + ' W</td>' +
+        '<td>' + (s.status === 'live' ? '<button class="action-btn btn-end" onclick="endStream(\'' + s.id + '\', this)">End Stream</button>' : '') + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="7" class="empty">No streams</td></tr>';
+  } catch(e) { document.getElementById('streams-body').innerHTML = '<tr><td colspan="7" class="empty">' + e.message + '</td></tr>'; }
+}
+
+async function endStream(id, btn) {
+  if (!confirm('Force end this stream?')) return;
+  try {
+    await apiFetch('/api/admin/streams/' + id + '/end', { method: 'POST', body: '{}' });
+    showToast('Stream ended');
+    loadStreams();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── TRANSACTIONS ──────────────────────────────────────────────────────────
+
+async function loadTransactions() {
+  document.getElementById('tx-body').innerHTML = loadingRow(5);
+  try {
+    var txs = await apiFetch('/api/admin/transactions');
+    document.getElementById('tx-count').textContent = '(' + txs.length + ')';
+    document.getElementById('tx-body').innerHTML = txs.map(function(t) {
+      var pos = t.amount > 0;
+      return '<tr>' +
+        '<td style="font-family:monospace;font-size:11px;color:var(--muted)">' + (t.id || '').slice(0,8) + '…</td>' +
+        '<td><span class="badge badge-user">' + t.type + '</span></td>' +
+        '<td style="color:' + (pos ? 'var(--success)' : 'var(--error)') + '">' + (pos ? '+' : '') + t.amount + ' W</td>' +
+        '<td><span class="badge ' + (t.status === 'completed' ? 'badge-ok' : 'badge-scheduled') + '">' + t.status + '</span></td>' +
+        '<td style="color:var(--muted);font-size:12px">' + fmt(t.createdAt) + '</td></tr>';
+    }).join('') || '<tr><td colspan="5" class="empty">No transactions</td></tr>';
+  } catch(e) { document.getElementById('tx-body').innerHTML = '<tr><td colspan="5" class="empty">' + e.message + '</td></tr>'; }
+}
+
+// ── DONATIONS ─────────────────────────────────────────────────────────────
+
+async function loadDonations() {
+  document.getElementById('donations-body').innerHTML = loadingRow(5);
+  try {
+    var list = await apiFetch('/api/admin/donations');
+    document.getElementById('donations-count').textContent = '(' + list.length + ')';
+    document.getElementById('donations-body').innerHTML = list.map(function(d) {
+      return '<tr><td>' + (d.sender ? d.sender.displayName : '—') + '</td><td>' + (d.receiver ? d.receiver.displayName : '—') + '</td><td style="color:var(--success)">' + d.amount + ' W</td><td style="color:var(--muted)">' + (d.message || '—') + '</td><td style="color:var(--muted);font-size:12px">' + fmt(d.createdAt) + '</td></tr>';
+    }).join('') || '<tr><td colspan="5" class="empty">No donations</td></tr>';
+  } catch(e) { document.getElementById('donations-body').innerHTML = '<tr><td colspan="5" class="empty">' + e.message + '</td></tr>'; }
+}
+
+// ── GIFTS ─────────────────────────────────────────────────────────────────
+
+async function loadGifts() {
+  document.getElementById('gifts-body').innerHTML = loadingRow(4);
+  try {
+    var list = await apiFetch('/api/admin/gifts');
+    document.getElementById('gifts-count').textContent = '(' + list.length + ')';
+    document.getElementById('gifts-body').innerHTML = list.map(function(g) {
+      return '<tr><td>' + (g.emoji || '🎁') + ' <strong>' + (g.title || g.name || '—') + '</strong></td><td><span class="badge badge-user">' + (g.category || '—') + '</span></td><td style="color:var(--primary)">' + g.price + ' W</td><td style="color:var(--muted)">' + (g.assetType || 'emoji') + '</td></tr>';
+    }).join('') || '<tr><td colspan="4" class="empty">No gifts</td></tr>';
+  } catch(e) { document.getElementById('gifts-body').innerHTML = '<tr><td colspan="4" class="empty">' + e.message + '</td></tr>'; }
+}
+
+// ── PAID MESSAGES ─────────────────────────────────────────────────────────
+
+async function loadPaidMessages() {
+  document.getElementById('pm-body').innerHTML = loadingRow(5);
+  try {
+    var list = await apiFetch('/api/admin/paid-messages');
+    document.getElementById('pm-count').textContent = '(' + list.length + ')';
+    document.getElementById('pm-body').innerHTML = list.map(function(m) {
+      return '<tr><td>' + (m.sender ? m.sender.displayName : '—') + '</td><td>' + (m.receiver ? m.receiver.displayName : '—') + '</td><td style="color:var(--muted)">' + (m.text || '—') + '</td><td style="color:var(--primary)">' + m.amount + ' W</td><td style="color:var(--muted);font-size:12px">' + fmt(m.createdAt) + '</td></tr>';
+    }).join('') || '<tr><td colspan="5" class="empty">No paid messages</td></tr>';
+  } catch(e) { document.getElementById('pm-body').innerHTML = '<tr><td colspan="5" class="empty">' + e.message + '</td></tr>'; }
+}
+
+// ── MARKETPLACE ───────────────────────────────────────────────────────────
+
+async function loadMarketplace() {
+  document.getElementById('jobs-body').innerHTML = loadingRow(6);
+  try {
+    var list = await apiFetch('/api/marketplace/jobs');
+    document.getElementById('jobs-count').textContent = '(' + list.length + ')';
+    document.getElementById('jobs-body').innerHTML = list.map(function(j) {
+      return '<tr><td><strong>' + j.title + '</strong></td><td><span class="badge badge-user">' + j.category + '</span></td><td style="color:var(--primary)">' + j.budget + ' W</td><td>' + j.applicantsCount + '</td><td>' + statusBadge(j.status) + '</td><td style="color:var(--muted);font-size:12px">' + fmt(j.createdAt) + '</td></tr>';
+    }).join('') || '<tr><td colspan="6" class="empty">No jobs</td></tr>';
+  } catch(e) { document.getElementById('jobs-body').innerHTML = '<tr><td colspan="6" class="empty">' + e.message + '</td></tr>'; }
+}
+</script>
+</body>
+</html>
