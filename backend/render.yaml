@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: wplus-backend
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node dist/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PLATFORM_COMMISSION
+        value: "0.15"
+      - key: DEFAULT_CURRENCY
+        value: W
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: wplus-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: wplus-db
+          property: port
+      - key: DATABASE_USER
+        fromDatabase:
+          name: wplus-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: wplus-db
+          property: password
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: wplus-db
+          property: database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wplus-db
+          property: connectionString
+      - key: REDIS_HOST
+        value: ""
+      - key: REDIS_PORT
+        value: "6379"
+
+databases:
+  - name: wplus-db
+    databaseName: wplus
+    user: wplus
+    plan: free
+    region: oregon

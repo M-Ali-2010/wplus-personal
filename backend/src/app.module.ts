@@ -34,33 +34,30 @@ import { Job } from './entities/job.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DATABASE_HOST', 'localhost'),
-        port: config.get<number>('DATABASE_PORT', 5432),
-        username: config.get('DATABASE_USER', 'wplus'),
-        password: config.get('DATABASE_PASSWORD', 'wplus_secret'),
-        database: config.get('DATABASE_NAME', 'wplus'),
-        entities: [
-          User,
-          Wallet,
-          Transaction,
-          Gift,
-          GiftCategory,
-          GiftTransaction,
-          Stream,
-          StreamComment,
-          Donation,
-          AiOpponent,
-          Battle,
-          PaidMessage,
-          Subscription,
-          PremiumPost,
-          Job,
-        ],
-        synchronize: config.get('NODE_ENV') !== 'production',
-        logging: config.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbUrl = config.get<string>('DATABASE_URL');
+        const base = {
+          entities: [
+            User, Wallet, Transaction, Gift, GiftCategory, GiftTransaction,
+            Stream, StreamComment, Donation, AiOpponent, Battle, PaidMessage,
+            Subscription, PremiumPost, Job,
+          ],
+          synchronize: true,
+          logging: config.get('NODE_ENV') === 'development',
+        };
+        if (dbUrl) {
+          return { type: 'postgres' as const, url: dbUrl, ssl: { rejectUnauthorized: false }, ...base };
+        }
+        return {
+          type: 'postgres' as const,
+          host: config.get<string>('DATABASE_HOST', 'localhost'),
+          port: config.get<number>('DATABASE_PORT', 5432),
+          username: config.get<string>('DATABASE_USER', 'wplus'),
+          password: config.get<string>('DATABASE_PASSWORD', 'wplus_secret'),
+          database: config.get<string>('DATABASE_NAME', 'wplus'),
+          ...base,
+        };
+      },
     }),
     AuthModule,
     WalletModule,
