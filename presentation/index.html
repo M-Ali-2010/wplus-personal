@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W+ — Pitch · Muhammad Ali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050510;
+    --bg2:#0B0817;
+    --card:#12101F;
+    --card2:#1A1530;
+    --magenta:#FF2EA6;
+    --magenta2:#FF00FF;
+    --violet:#8A2BE2;
+    --violet2:#7C5CFF;
+    --gold:#FFC857;
+    --paper:#F6F3FF;
+    --muted:#9A93B8;
+    --dim:#615B7E;
+    --line:rgba(255,255,255,.09);
+    --disp:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --mono:'Space Mono',ui-monospace,monospace;
+    --grad:linear-gradient(120deg,#FF2EA6,#8A2BE2);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--paper);font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(55% 55% at 15% 10%,rgba(124,92,255,.16),transparent 60%),
+      radial-gradient(48% 48% at 88% 90%,rgba(255,46,166,.15),transparent 60%);
+  }
+  .deck{position:fixed;inset:0;z-index:1;overflow:hidden}
+  .track{display:flex;height:100%;width:100%;transition:transform .6s cubic-bezier(.76,0,.24,1)}
+  .slide{
+    position:relative;flex:0 0 100%;height:100%;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(34px,6vw,120px);
+  }
+  .slide::after{
+    content:attr(data-mark);
+    position:absolute;top:clamp(28px,4vh,48px);right:clamp(34px,6vw,120px);
+    font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--dim);
+  }
+  .brand{
+    position:absolute;top:clamp(26px,4vh,46px);left:clamp(34px,6vw,120px);
+    font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:-.02em;
+  }
+  .brand b{color:var(--paper)}
+  .brand i{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--magenta);display:flex;align-items:center;gap:11px;margin-bottom:26px;
+  }
+  .eyebrow::before{content:"●";color:var(--gold);font-size:9px}
+
+  h1{font-family:var(--disp);font-weight:700;line-height:.95;letter-spacing:-.03em}
+  h2{font-family:var(--disp);font-weight:700;line-height:1.02;letter-spacing:-.02em}
+  .lead{color:var(--muted);font-size:clamp(16px,1.5vw,22px);line-height:1.55;max-width:48ch}
+  .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .gold{color:var(--gold)}
+
+  /* S1 HERO */
+  .s-hero h1{font-size:clamp(76px,15vw,230px)}
+  .s-hero .tag{font-family:var(--disp);font-weight:600;font-size:clamp(22px,3.6vw,50px);margin-top:6px;letter-spacing:-.02em}
+  .s-hero .sub{margin-top:26px}
+  .s-hero .who{
+    position:absolute;left:clamp(34px,6vw,120px);bottom:clamp(34px,5vh,60px);
+    font-family:var(--mono);font-size:14px;color:var(--muted);letter-spacing:.02em;line-height:1.7;
+  }
+  .s-hero .who b{color:var(--paper);font-weight:700}
+  .s-hero .who .role{color:var(--magenta)}
+
+  /* S2 WHO */
+  .s-who h2{font-size:clamp(34px,5.4vw,72px);max-width:16ch;margin-bottom:30px}
+  .who-row{display:flex;gap:clamp(20px,3vw,48px);flex-wrap:wrap;margin-top:10px}
+  .who-card{
+    border:1px solid var(--line);background:var(--card);border-radius:18px;
+    padding:24px 26px;min-width:200px;flex:1;
+  }
+  .who-card .n{font-family:var(--disp);font-weight:700;font-size:clamp(30px,4vw,52px);line-height:1}
+  .who-card .l{font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.06em;margin-top:10px;text-transform:uppercase}
+
+  /* S3 PROBLEM */
+  .grid2{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(30px,5vw,86px);align-items:center}
+  .s-prob h2{font-size:clamp(34px,5.2vw,70px)}
+  .pains{display:flex;flex-direction:column;gap:14px}
+  .pain{
+    border:1px solid var(--line);border-left:3px solid var(--magenta);border-radius:0 14px 14px 0;
+    background:linear-gradient(90deg,rgba(255,46,166,.07),transparent);padding:18px 22px;
+  }
+  .pain b{font-family:var(--disp);font-size:18px;display:block;margin-bottom:3px}
+  .pain span{color:var(--muted);font-size:14.5px;line-height:1.45}
+
+  /* S4 SOLUTION */
+  .s-sol{align-items:flex-start}
+  .s-sol h2{font-size:clamp(38px,6.2vw,90px);max-width:14ch;margin-bottom:8px}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:9px 13px;margin-top:36px;font-family:var(--mono);font-size:clamp(13px,1.5vw,19px)}
+  .flow .n{padding:9px 17px;border:1px solid var(--line);border-radius:999px;background:var(--card);white-space:nowrap}
+  .flow .a{color:var(--gold);font-weight:700}
+  .flow .n.win{border-color:rgba(255,200,87,.5);color:var(--gold)}
+
+  /* S5 LOOP signature */
+  .s-loop{align-items:center;text-align:center}
+  .s-loop .eyebrow{justify-content:center}
+  .s-loop h2{font-size:clamp(30px,4.6vw,62px);margin-bottom:8px}
+  .s-loop .lead{margin:0 auto}
+  .loopwrap{width:min(1080px,93vw);margin:clamp(16px,4vh,42px) auto 0}
+  .loopwrap svg{width:100%;height:auto;display:block;overflow:visible}
+  .lnode{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+  .lnode.author{stroke:rgba(255,200,87,.5)}
+  .llabel{font-family:var(--disp);font-weight:600;fill:var(--paper)}
+  .lsub{font-family:var(--mono);fill:var(--muted)}
+  .lpath{fill:none;stroke:rgba(255,255,255,.15);stroke-width:2;stroke-dasharray:2 9;stroke-linecap:round}
+  .coin{fill:var(--gold);filter:drop-shadow(0 0 9px rgba(255,200,87,.7))}
+  .coin-t{font-family:var(--mono);font-weight:700;fill:#1a1200;font-size:14px}
+
+  /* S6 FEATURES */
+  .s-feat h2{font-size:clamp(32px,5vw,66px);margin-bottom:30px}
+  .fgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .chip{
+    border:1px solid var(--line);background:var(--card);border-radius:15px;
+    padding:18px 16px;min-height:118px;display:flex;flex-direction:column;justify-content:space-between;
+    transition:transform .25s,border-color .25s,background .25s;
+  }
+  .chip .ic{font-size:24px}
+  .chip .nm{font-family:var(--disp);font-weight:600;font-size:clamp(14px,1.2vw,18px);line-height:1.12}
+  .chip:hover{transform:translateY(-4px);border-color:rgba(124,92,255,.5);background:var(--card2)}
+  .chip.k{background:linear-gradient(160deg,rgba(255,46,166,.16),var(--card));border-color:rgba(255,46,166,.4)}
+
+  /* S7 TECH */
+  .s-tech h2{font-size:clamp(30px,4.6vw,60px);margin-bottom:26px}
+  .stack{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px;max-width:760px}
+  .stack span{font-family:var(--mono);font-size:13px;color:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 14px;background:var(--card)}
+  .ledger{border-top:1px solid var(--line);margin-top:34px}
+  .ledger .row{display:flex;gap:18px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line)}
+  .ledger .row .tk{font-family:var(--mono);color:var(--gold);font-size:13px;min-width:40px;padding-top:3px}
+  .ledger .row p{font-size:clamp(15px,1.4vw,19px);line-height:1.4}
+  .ledger .row p b{font-family:var(--disp);font-weight:600}
+  .ledger .row p em{font-style:normal;color:var(--magenta);font-weight:600}
+
+  /* S8 LIVE */
+  .s-live{align-items:flex-start}
+  .s-live h2{font-size:clamp(34px,5.4vw,74px);margin-bottom:24px}
+  .live-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+  .pill{
+    display:flex;align-items:center;gap:10px;border:1px solid rgba(0,230,118,.25);
+    background:rgba(0,230,118,.06);border-radius:13px;padding:14px 20px;
+  }
+  .pill .d{font-family:var(--disp);font-weight:600;font-size:15px}
+  .pill .s{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .pill .ok{color:#00E676;font-size:18px}
+  .url{font-family:var(--mono);font-size:clamp(13px,1.4vw,17px);color:var(--gold);margin-top:30px;border:1px dashed rgba(255,200,87,.4);border-radius:10px;padding:12px 18px;display:inline-block}
+
+  /* S9 DEMO */
+  .s-demo{align-items:center;justify-content:center;text-align:center}
+  .s-demo .big{
+    font-family:var(--disp);font-weight:700;font-size:clamp(84px,19vw,280px);line-height:.9;letter-spacing:-.04em;
+    background:linear-gradient(120deg,var(--magenta),var(--violet2) 55%,var(--gold));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .s-demo .lead{margin:18px auto 0}
+
+  /* S10 CLOSE */
+  .s-close{align-items:center;justify-content:center;text-align:center}
+  .s-close .w{font-family:var(--disp);font-weight:700;font-size:clamp(80px,17vw,250px);line-height:.9}
+  .s-close .w i{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .s-close .thanks{font-family:var(--disp);font-weight:600;font-size:clamp(24px,3.2vw,44px);margin-top:14px}
+  .s-close .contact{font-family:var(--mono);font-size:14px;color:var(--muted);margin-top:28px;display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
+  .s-close .contact b{color:var(--paper);font-weight:700}
+
+  /* HUD */
+  .hud{position:fixed;z-index:5;left:0;right:0;bottom:clamp(18px,3vh,30px);display:flex;align-items:center;justify-content:center;gap:22px;pointer-events:none}
+  .dots{display:flex;gap:9px;pointer-events:auto}
+  .dot{width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.22);border:0;cursor:pointer;padding:0;transition:all .3s}
+  .dot.on{background:var(--magenta);width:26px}
+  .nav{display:flex;gap:8px;pointer-events:auto}
+  .nav button{width:42px;height:42px;border-radius:999px;border:1px solid var(--line);background:rgba(18,16,31,.7);color:var(--paper);font-size:18px;cursor:pointer;backdrop-filter:blur(6px);transition:.25s}
+  .nav button:hover{border-color:var(--magenta);color:var(--magenta)}
+  .counter{position:fixed;z-index:5;right:clamp(24px,5vw,56px);bottom:clamp(20px,3vh,34px);font-family:var(--mono);font-size:13px;color:var(--dim)}
+  .pbar{position:fixed;top:0;left:0;height:3px;background:var(--grad);z-index:6;transition:width .5s cubic-bezier(.76,0,.24,1)}
+
+  .slide.active .anim{animation:rise .65s cubic-bezier(.2,.7,.2,1) both}
+  .slide.active .anim:nth-child(2){animation-delay:.06s}
+  .slide.active .anim:nth-child(3){animation-delay:.12s}
+  .slide.active .anim:nth-child(4){animation-delay:.18s}
+  .slide.active .anim:nth-child(5){animation-delay:.24s}
+  @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+  @media (max-width:820px){
+    .grid2{grid-template-columns:1fr}
+    .fgrid{grid-template-columns:repeat(2,1fr)}
+    .who-row{flex-direction:column}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .track{transition:none}.slide.active .anim{animation:none}.coin{animation:none}[data-anim]{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="pbar" id="pbar"></div>
+<div class="deck">
+  <div class="track" id="track">
+
+    <!-- 1 HERO -->
+    <section class="slide s-hero active" data-mark="W+ · 01">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Creator Economy Platform</div>
+      <h1 class="anim">W<span class="g">+</span></h1>
+      <div class="tag anim">Kontent — bu <span class="gold">daromad.</span></div>
+      <p class="lead sub anim">Jonli efir, sovgʻalar, donatlar, obunalar va daromad — barchasi bitta ilovada, yagona balans orqali.</p>
+      <div class="who">
+        <b>Muhammad Ali</b> · <span class="role">Full-Stack Developer</span><br>
+        Bu ilovani boshidan oxirigacha men yaratdim
+      </div>
+    </section>
+
+    <!-- 2 WHO -->
+    <section class="slide s-who" data-mark="MEN KIM MAN · 02">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Men haqimda</div>
+      <h2 class="anim">Streaming ilovasini <span class="g">yakka oʻzim</span> qurdim — frontend, backend, deploy.</h2>
+      <div class="who-row">
+        <div class="who-card anim"><div class="n g">Full-Stack</div><div class="l">Frontend · Backend · DevOps</div></div>
+        <div class="who-card anim"><div class="n gold">~13k</div><div class="l">qator kod</div></div>
+        <div class="who-card anim"><div class="n">18</div><div class="l">bogʻlangan modul</div></div>
+      </div>
+    </section>
+
+    <!-- 3 PROBLEM -->
+    <section class="slide s-prob" data-mark="MUAMMO · 03">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="grid2">
+        <div>
+          <div class="eyebrow anim">Muammo</div>
+          <h2 class="anim">Mualliflar daromadni <span class="g">qiyinchilik</span> bilan oladi.</h2>
+        </div>
+        <div class="pains">
+          <div class="pain anim"><b>Donatlar — qoʻlda</b><span>Pul kartaga oʻtkaziladi, hisob-kitob va shaffoflik yoʻq.</span></div>
+          <div class="pain anim"><b>Hammasi tarqoq</b><span>Efir, sovgʻa, obuna — har biri alohida xizmatda, bogʻlanmagan.</span></div>
+          <div class="pain anim"><b>Yagona tizim yoʻq</b><span>Butun daromadni bitta joyda koʻrsatadigan platforma yoʻq.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 SOLUTION -->
+    <section class="slide s-sol" data-mark="YECHIM · 04">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Yechim</div>
+      <h2 class="anim">W+ — yagona <span class="g">creator economy.</span></h2>
+      <div class="flow anim">
+        <span class="n">Kontent</span><span class="a">→</span>
+        <span class="n">Jonli efir</span><span class="a">→</span>
+        <span class="n">Sovgʻa · Donat · Obuna</span><span class="a">→</span>
+        <span class="n win">Daromad</span>
+      </div>
+      <p class="lead anim" style="margin-top:30px">Har bir amal yagona hamyon va yagona <span class="gold">transactions</span> jadvali orqali oʻtadi. Efirdan daromadgacha — bitta tizim.</p>
+    </section>
+
+    <!-- 5 LOOP -->
+    <section class="slide s-loop" data-mark="QANDAY ISHLAYDI · 05">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Iqtisodiyot halqasi</div>
+      <h2 class="anim">Pulning yopiq halqasi</h2>
+      <p class="lead anim">Tanga tomoshabindan muallifgacha — real vaqtda, yagona balans orqali.</p>
+      <div class="loopwrap anim">
+        <svg viewBox="0 0 1000 300" role="img" aria-label="Iqtisodiyot halqasi">
+          <path id="loopPath" class="lpath" d="M 110 200 H 335 H 560 H 785 C 900 200 960 130 890 60 C 760 40 240 40 110 60 C 40 130 40 200 110 200 Z"/>
+          <g fill="#FFC857" font-family="var(--mono)" font-weight="700" font-size="20">
+            <text x="222" y="207" text-anchor="middle">→</text>
+            <text x="447" y="207" text-anchor="middle">→</text>
+            <text x="672" y="207" text-anchor="middle">→</text>
+          </g>
+          <g text-anchor="middle">
+            <circle class="lnode" cx="110" cy="200" r="52"/>
+            <text class="llabel" x="110" y="196" font-size="15">Tomosha-</text>
+            <text class="llabel" x="110" y="214" font-size="15">bin</text>
+            <circle class="lnode" cx="335" cy="200" r="52"/>
+            <text class="llabel" x="335" y="205" font-size="17">Balans</text>
+            <circle class="lnode" cx="560" cy="200" r="58"/>
+            <text class="lsub" x="560" y="194" font-size="11">yagona</text>
+            <text class="llabel" x="560" y="214" font-size="14">Transaksiya</text>
+            <circle class="lnode author" cx="785" cy="200" r="52"/>
+            <text class="llabel" x="785" y="205" font-size="16" fill="#FFC857">Muallif</text>
+            <circle class="lnode" cx="890" cy="60" r="46"/>
+            <text class="llabel" x="890" y="65" font-size="14" fill="#FFC857">Daromad</text>
+          </g>
+          <g class="coin" data-anim>
+            <circle r="16"/>
+            <text class="coin-t" text-anchor="middle" y="5">W</text>
+            <animateMotion dur="5s" repeatCount="indefinite"
+              keyPoints="0;0.2;0.4;0.62;0.82;1" keyTimes="0;0.2;0.4;0.6;0.85;1" calcMode="linear">
+              <mpath href="#loopPath"/>
+            </animateMotion>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 6 FEATURES -->
+    <section class="slide s-feat" data-mark="IMKONIYATLAR · 06">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Imkoniyatlar</div>
+      <h2 class="anim">Bitta ilovada — hammasi</h2>
+      <div class="fgrid anim">
+        <div class="chip k"><span class="ic">📡</span><span class="nm">Jonli efir</span></div>
+        <div class="chip k"><span class="ic">🎁</span><span class="nm">Animatsion sovgʻalar</span></div>
+        <div class="chip"><span class="ic">💸</span><span class="nm">Donatlar</span></div>
+        <div class="chip"><span class="ic">💬</span><span class="nm">Pullik xabarlar</span></div>
+        <div class="chip"><span class="ic">⭐</span><span class="nm">Premium obuna</span></div>
+        <div class="chip k"><span class="ic">👛</span><span class="nm">Ichki hamyon</span></div>
+        <div class="chip"><span class="ic">⚔️</span><span class="nm">AI janglar</span></div>
+        <div class="chip"><span class="ic">💼</span><span class="nm">Marketplace</span></div>
+        <div class="chip"><span class="ic">🖥️</span><span class="nm">Admin panel</span></div>
+        <div class="chip"><span class="ic">⚡</span><span class="nm">Real vaqt</span></div>
+      </div>
+    </section>
+
+    <!-- 7 TECH -->
+    <section class="slide s-tech" data-mark="TEXNOLOGIYA · 07">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Muhandislik</div>
+      <h2 class="anim">Texnologiya</h2>
+      <div class="stack anim">
+        <span>Flutter</span><span>NestJS</span><span>PostgreSQL</span><span>Redis</span>
+        <span>WebSocket</span><span>LiveKit</span><span>TypeORM</span><span>JWT</span>
+      </div>
+      <div class="ledger anim">
+        <div class="row"><span class="tk">01</span><p><b>Yagona reestr.</b> Barcha moliya faqat <em>transactions</em> jadvali orqali — toʻgʻridan-toʻgʻri balans oʻzgartirilmaydi.</p></div>
+        <div class="row"><span class="tk">02</span><p><b>Idempotentlik.</b> Soʻrov takrorlansa ham <em>pul ikki marta yechilmaydi.</em></p></div>
+        <div class="row"><span class="tk">03</span><p><b>Real vaqt.</b> Sovgʻa, donat, chat — <em>WebSocket hodisalari</em> orqali, polling emas.</p></div>
+        <div class="row"><span class="tk">04</span><p><b>Prodakshnda.</b> Backend <em>Render'da deploy qilingan</em>, ilova jonli serverga ulanadi.</p></div>
+      </div>
+    </section>
+
+    <!-- 8 LIVE -->
+    <section class="slide s-live" data-mark="JONLI · 08">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="eyebrow anim">Tayyor mahsulot</div>
+      <h2 class="anim">Bu — maket emas. <span class="g">Jonli ishlaydi.</span></h2>
+      <div class="live-row">
+        <div class="pill anim"><span class="ok">✓</span><div><div class="d">Backend</div><div class="s">Render'da live</div></div></div>
+        <div class="pill anim"><span class="ok">✓</span><div><div class="d">14 / 14 API</div><div class="s">barchasi ishlaydi</div></div></div>
+        <div class="pill anim"><span class="ok">✓</span><div><div class="d">Mobil ilova</div><div class="s">jonli serverga ulangan</div></div></div>
+        <div class="pill anim"><span class="ok">✓</span><div><div class="d">Admin panel</div><div class="s">real vaqt ma'lumot</div></div></div>
+      </div>
+      <span class="url anim">https://wplus-aliyt.onrender.com</span>
+    </section>
+
+    <!-- 9 DEMO -->
+    <section class="slide s-demo" data-mark="DEMO · 09">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="big anim">DEMO</div>
+      <p class="lead anim">Endi jonli koʻrsataman: lending → mobil ilova → admin panel.</p>
+    </section>
+
+    <!-- 10 CLOSE -->
+    <section class="slide s-close" data-mark="W+ · 10">
+      <span class="brand"><b>W</b><i>+</i></span>
+      <div class="w anim">W<i>+</i></div>
+      <div class="thanks anim">Eʼtiboringiz uchun <span class="gold">rahmat.</span></div>
+      <div class="contact anim">
+        <span><b>Muhammad Ali</b> · Full-Stack Developer</span>
+        <span>github.com/M-Ali-2010</span>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="hud">
+  <div class="nav"><button id="prev" aria-label="Oldingi">‹</button></div>
+  <div class="dots" id="dots"></div>
+  <div class="nav"><button id="next" aria-label="Keyingi">›</button></div>
+</div>
+<div class="counter" id="counter">01 / 10</div>
+
+<script>
+(function(){
+  const track=document.getElementById('track');
+  const slides=[...document.querySelectorAll('.slide')];
+  const dotsWrap=document.getElementById('dots');
+  const counter=document.getElementById('counter');
+  const pbar=document.getElementById('pbar');
+  let i=0;const n=slides.length;
+  slides.forEach((_,k)=>{
+    const b=document.createElement('button');
+    b.className='dot'+(k===0?' on':'');
+    b.setAttribute('aria-label','Slayd '+(k+1));
+    b.addEventListener('click',()=>go(k));
+    dotsWrap.appendChild(b);
+  });
+  const dots=[...dotsWrap.children];
+  function go(k){
+    i=Math.max(0,Math.min(n-1,k));
+    track.style.transform='translateX(-'+(i*100)+'%)';
+    slides.forEach((s,x)=>s.classList.toggle('active',x===i));
+    dots.forEach((d,x)=>d.classList.toggle('on',x===i));
+    const pad=v=>String(v).padStart(2,'0');
+    counter.textContent=pad(i+1)+' / '+pad(n);
+    pbar.style.width=((i+1)/n*100)+'%';
+  }
+  const next=()=>go(i+1), prev=()=>go(i-1);
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prev);
+  window.addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();next();}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();prev();}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(n-1);
+  });
+  let sx=0;
+  window.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  window.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)dx<0?next():prev();},{passive:true});
+  go(0);pbar.style.width=(1/n*100)+'%';
+})();
+</script>
+</body>
+</html>

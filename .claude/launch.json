@@ -12,6 +12,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-p", "5501", "landing"],
       "port": 5501
+    },
+    {
+      "name": "presentation",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "5502", "presentation"],
+      "port": 5502
     }
   ]
 }
