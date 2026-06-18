@@ -12,10 +12,11 @@ final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
 
 final apiClientProvider = Provider<Dio>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
+  // Generous timeouts: Render free tier cold-starts can take 30-50s after sleep.
   final dio = Dio(BaseOptions(
     baseUrl: AppConfig.apiBaseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 15),
+    connectTimeout: const Duration(seconds: 60),
+    receiveTimeout: const Duration(seconds: 60),
     headers: {'Content-Type': 'application/json'},
   ));
 
@@ -26,6 +27,14 @@ final apiClientProvider = Provider<Dio>((ref) {
         options.headers['Authorization'] = 'Bearer $token';
       }
       handler.next(options);
+    },
+    onError: (e, handler) {
+      // Stale/invalid token (e.g. left over from a different backend/secret):
+      // clear it so the app falls back to the login screen instead of looping 401s.
+      if (e.response?.statusCode == 401) {
+        ref.read(authTokenProvider.notifier).clear();
+      }
+      handler.next(e);
     },
   ));
 
